@@ -2,6 +2,7 @@
 using JSC = NiL.JS.Core;
 using JSL = NiL.JS.BaseLibrary;
 using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace X13 {
@@ -68,6 +69,17 @@ namespace X13 {
       Assert.AreEqual(o_ac, r_a["c"]);
       Assert.AreEqual(v, r_a["d"]);
       Assert.AreEqual(o_b, r["b"]);
+    }
+
+    [TestMethod]
+    public void DateStringify() {
+      var dt  = new DateTime(2018, 05, 15, 10, 05, 02);  // {15.05.2018 10:05:02}
+      var dt_j = JSC.JSObject.Marshal(dt);  //  {Tue May 15 2018 10:05:02 GMT+0200 (W. Europe Daylight Time)}
+      var json = JSL.JSON.stringify(dt_j);  // "2018-05-15T08:05:02.000Z"
+      var j_s = JSL.JSON.parse(json);
+      var j_dt = new JSL.Date(new JSC.Arguments() { j_s });  // {Tue May 15 2018 08:05:02 GMT+0200 (W. Europe Daylight Time)}
+      var dt_o = j_dt.ToDateTime();  // {15.05.2018 08:05:02}
+      Assert.AreEqual(dt, dt_o);  // failed. Expected:<15.05.2018 10:05:02>. Actual:<15.05.2018 08:05:02>.
     }
   }
 }
